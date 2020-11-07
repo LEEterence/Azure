@@ -1,0 +1,46 @@
+{
+  "id": "/subscriptions/8d8b9f17-4bd6-40ee-b518-28492def54f2/resourceGroups/DNS-MS-Learn/providers/Microsoft.Resources/deployments/Microsoft.DnsZone-20201006160656880",
+  "name": "Microsoft.DnsZone-20201006160656880",
+  "type": "Microsoft.Resources/deployments",
+  "tags": {
+    "primaryResourceId": "/subscriptions/8d8b9f17-4bd6-40ee-b518-28492def54f2/resourcegroups/DNS-MS-Learn/providers/Microsoft.Network/dnsZones/wideworldimportsX21237125634sadfabsdjf.com",
+    "marketplaceItemId": "Microsoft.DnsZone-ARM"
+  },
+  "properties": {
+    "templateHash": "12228163025931425016",
+    "parameters": {
+      "dnsZonesName": {
+        "type": "String",
+        "value": "wideworldimportsX21237125634sadfabsdjf.com"
+      }
+    },
+    "mode": "Incremental",
+    "debugSetting": {
+      "detailLevel": "None"
+    },
+    "provisioningState": "Succeeded",
+    "timestamp": "2020-10-06T16:07:03.4337029Z",
+    "duration": "PT4.6171944S",
+    "correlationId": "7ab7f77e-93c2-44d6-86b0-3cebc87ca357",
+    "providers": [
+      {
+        "namespace": "Microsoft.Network",
+        "resourceTypes": [
+          {
+            "resourceType": "dnsZones",
+            "locations": [
+              "global"
+            ]
+          }
+        ]
+      }
+    ],
+    "dependencies": [],
+    "outputResources": [
+      {
+        "id": "/subscriptions/8d8b9f17-4bd6-40ee-b518-28492def54f2/resourceGroups/DNS-MS-Learn/providers/Microsoft.Network/dnsZones/wideworldimportsX21237125634sadfabsdjf.com"
+      }
+    ],
+    "validationLevel": "Template"
+  }
+}
