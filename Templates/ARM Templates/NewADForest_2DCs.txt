@@ -1,0 +1,86 @@
+# Source: https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/virtual-dc/adds-on-azure-vm#components
+# Run in Azure CLI
+
+#Update based on your organizational requirements
+LOCATION=westus2
+RESOURCEGROUPNAME=ADonAzureVMs
+NETWORKSECURITYGROUP=NSG-DomainControllers
+VNETNAME=VNet-AzureVMsWestUS2
+VNETADDRESS=10.10.0.0/16
+SUBNETNAME=Subnet-AzureDCsWestUS2
+SUBNETADDRESS=10.10.10.0/24
+AVAILABILITYSET=DomainControllers
+VMSIZE=Standard_B2s
+DATADISKSIZE=20
+ADMINUSERNAME=azureuser
+ADMINPASSWORD=ChangeMe123456
+DOMAINCONTROLLER1=AZDC01
+DC1IP=10.10.10.11
+DOMAINCONTROLLER2=AZDC02
+DC2IP=10.10.10.12
+
+# Create a resource group.
+az group create --name $RESOURCEGROUPNAME \
+                --location $LOCATION
+
+# Create a network security group
+az network nsg create --name $NETWORKSECURITYGROUP \
+                      --resource-group $RESOURCEGROUPNAME \
+                      --location $LOCATION
+
+# Create a network security group rule for port 3389.
+az network nsg rule create --name PermitRDP \
+                           --nsg-name $NETWORKSECURITYGROUP \
+                           --priority 1000 \
+                           --resource-group $RESOURCEGROUPNAME \
+                           --access Allow \
+                           --source-address-prefixes "*" \
+                           --source-port-ranges "*" \
+                           --direction Inbound \
+                           --destination-port-ranges 3389
+
+# Create a virtual network
+az network vnet create --name $VNETNAME \
+                       --resource-group $RESOURCEGROUPNAME \
+                       --address-prefixes $VNETADDRESS \
+                       --location $LOCATION \
+
+# Create a subnet
+az network vnet subnet create --address-prefix $SUBNETADDRESS \
+                              --name $SUBNETNAME \
+                              --resource-group $RESOURCEGROUPNAME \
+                              --vnet-name $VNETNAME \
+                              --network-security-group $NETWORKSECURITYGROUP
+
+# Create an availability set.
+az vm availability-set create --name $AVAILABILITYSET \
+                              --resource-group $RESOURCEGROUPNAME \
+                              --location $LOCATION
+
+# Create two virtual machines.
+az vm create \
+    --resource-group $RESOURCEGROUPNAME \
+    --availability-set $AVAILABILITYSET \
+    --name $DOMAINCONTROLLER1 \
+    --size $VMSIZE \
+    --image Win2019Datacenter \
+    --admin-username $ADMINUSERNAME \
+    --admin-password $ADMINPASSWORD \
+    --data-disk-sizes-gb $DATADISKSIZE \
+    --data-disk-caching None \
+    --nsg $NETWORKSECURITYGROUP \
+    --private-ip-address $DC1IP \
+    --no-wait
+
+az vm create \
+    --resource-group $RESOURCEGROUPNAME \
+    --availability-set $AVAILABILITYSET \
+    --name $DOMAINCONTROLLER2 \
+    --size $VMSIZE \
+    --image Win2019Datacenter \
+    --admin-username $ADMINUSERNAME \
+    --admin-password $ADMINPASSWORD \
+    --data-disk-sizes-gb $DATADISKSIZE \
+    --data-disk-caching None \
+    --nsg $NETWORKSECURITYGROUP \
+    --private-ip-address $DC2IP

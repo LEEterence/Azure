@@ -45,6 +45,9 @@
     $vm.HardwareProfile.VmSize = "Standard_B2s"
     Update-AzVM -VM $vm -ResourceGroupName az104-RG
 
-#Deleting Resources
+# Deleting Resources
     # Cleaning up VMs
     Remove-AzVM -ResourceGroupName Az104-RG -Name simple-vm
+
+# Scale Sets
+    Get-AzVmss 
