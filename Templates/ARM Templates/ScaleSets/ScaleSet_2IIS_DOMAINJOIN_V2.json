@@ -337,8 +337,8 @@
                                     "typeHandlerVersion": "1.3",
                                     "settings": {
                                         "Name": "[parameters('domainName')]",
-                                        "OUPath": "[variables('ouPath')]",
-                                        "User": "[variables('domainAndUsername')]",
+                                        "OUPath": "[parameters('ouPath')]",
+                                        "User": "[parameters('domainAndUsername')]",
                                         "Restart": "true",
                                         "Options": "[variables('domainJoinOptions')]"
                                     },

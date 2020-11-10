@@ -51,3 +51,12 @@
 
 # Scale Sets
     Get-AzVmss 
+
+# Managing virtual networks
+    Get-AzVirtualNetwork 
+    # Obtain Virtual Network Address Space
+    Get-AzVirtualNetwork | Select-Object -Property Name -ExpandProperty AddressSpace 
+    # Obtain name of Virtual network and its subnets
+    Get-AzVirtualNetwork | Select-Object name,subnets,Id
+    # Obtain name of subnets for a specific virtual network and subnet prefixes
+    Get-AzVirtualNetwork -name VNet-AzureVMsWestUS2 | Select-Object -ExpandProperty subnets | Select-Object Name, Subnet, AddressPrefix
