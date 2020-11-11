@@ -1,9 +1,12 @@
+<# 
+~ Enabling and automating authentication
 
+#>
 # Prerequisites - note MUST install-module as admin => Locate Az modules under C:\users\administrator\documents\PowerShell\Modules => Copy and paste into All users directory at C:\Program Files\PowerShell\Modules
 Import-Module Az
 #Requires -Module Az
 
-# ~ Enabling authentication
+# ~ Manual authentication
 
     Connect-AzAccount
         # Find information for subscription (essential for later commands)
@@ -16,7 +19,7 @@ Import-Module Az
         Get-AzContext -ListAvailable
         Set-AzContext -Name "Azure for Students"
 
-    # Creating service account to automate authentication
+#~ Creating service account to automate authentication
     # NOTE: MUST be global admin of the subscription (Azure for Students doesn't give global admin)
     $securepass = ConvertTo-SecureString -AsPlainText -Force -string "Password1"
     $myApp = New-AzADApplication -DisplayName AppForServicePrincipal -IdentifierUris 'http://appforserviceprincipal' -Password $securepass
