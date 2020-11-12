@@ -19,7 +19,7 @@ Set-VPNs2sinterface -name AzureVPN -IPaddress "<New Virtual Network Gateway Publ
 route -p ADD 10.0.0.0 MASK 255.255.0.0 "<VPN Server IP>" METRIC 10
 
 # Change VPN Idle Disconnect Time
-Set-VPNs2sinterface -name AzureVPN -IdleDisconnectSeconds <Number of Seconds>
+Set-VPNs2sinterface -name AzureVPN -IdleDisconnectSeconds '<Number of Seconds>'
 
 <# Sources:
 https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/jj574210(v=ws.11)

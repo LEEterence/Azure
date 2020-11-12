@@ -31,9 +31,6 @@
     # Setting locks
     New-AzResourceLock -LockName "NoDelete" -LockLevel donotdelete -ResourceGroupName "AZ104-RG"
 
-# Deploy a simple windows VM
-    New-AzResourceGroupDeployment -ResourceGroupName "AZ104-RG" -TemplateUri https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-windows/azuredeploy.json
-
 # Modifying VMs
     # Changing VM properties
     $vm = Get-AzVM -Name "simple-vm"
@@ -60,3 +57,9 @@
     Get-AzVirtualNetwork | Select-Object name,subnets,Id
     # Obtain name of subnets for a specific virtual network and subnet prefixes
     Get-AzVirtualNetwork -name VNet-AzureVMsWestUS2 | Select-Object -ExpandProperty subnets | Select-Object Name, Subnet, AddressPrefix
+
+# Obtaining Providers and Provider resources
+    # List Providers registration 
+    Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace,RegistrationState 
+    # Provider resources
+    Get-AzResourceProvider -ProviderNamespace Microsoft.Compute

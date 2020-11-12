@@ -1,3 +1,7 @@
+# @ Deploy a simple windows VM
+New-AzResourceGroupDeployment -ResourceGroupName "AZ104-RG" -TemplateUri https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-windows/azuredeploy.json
+
+# More options
 New-AzVm `
     -ResourceGroupName "SL-PowershellVM" `
     -Name "vmpshell01" `
