@@ -25,7 +25,7 @@
     Add-AzADGroupMember -MemberUserPrincipalName "johnwick@terencelee.ca" -TargetGroupDisplayName "Sysadmins"
     # Verify
     Get-AzADGroupMember -GroupDisplayName sysadmins
-
+    
 # Azure Resource Groups
     New-AzResourceGroup -Name "AZ104-RG" -Location 'westus'
     # Setting locks

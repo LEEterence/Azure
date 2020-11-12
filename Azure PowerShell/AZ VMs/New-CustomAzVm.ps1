@@ -37,14 +37,14 @@ function New-CustomAzVM {
         [pscredential]$AdminCredential,
 
         [Parameter()]
-        [string]$Location = 'West US',
+        [string]$Location = 'Canada Central',
 
         [Parameter()]
-        [string]$VmSize = 'Standard_B1ms',
+        [string]$VmSize = 'Standard_B2s',
         
         # Change as necessary
         [Parameter()]
-        [string]$SubnetAddressPrefix = '10.2.0.0/24',
+        [string]$SubnetAddressPrefix = '10.0.1.0/24',
 
         [Parameter()]
         [string]$VirtualNetworkAddressPrefix = '10.0.0.0/16',
@@ -165,11 +165,11 @@ function New-CustomAzVM {
         New-AzVM -VM $vm -ResourceGroupName $ResourceGroupName -Location $Location
 
         if (-not(Get-AzVM -Name $vm.Name)){
-            Write-Host "$($vm.Name) has failed" -ForegroundColor Red
+            Write-Host "$($vm.Name) has failed deployment" -ForegroundColor Red
         }else {
             Write-Host "$($vm.Name) has been created successfully" -ForegroundColor Green
             
-            Get-AzVM -Name $vm.Name 
+            #Get-AzVM -Name $vm.Name 
             Get-AzPublicIpAddress -ResourceName $PublicIpAddressName -publicIP | Select-Object Name,IpAddress
 
             $RDP = "RDP to the host (Y/N)?"

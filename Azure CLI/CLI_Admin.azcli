@@ -1,0 +1,7 @@
+# Reminder - everything is case sensitive
+
+# show providers
+az provider list --out table
+
+# Show resources under the provider
+az provider show --namespace Microsoft.Compute --query "resourceTypes[*].resourceType" --out table

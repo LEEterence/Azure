@@ -11,8 +11,15 @@ Connect-VPNs2sInterface -Name AzureVPN
 
 # NOTE: MUST DISABLE 'NetBios over TCPIP' within registry HKLM\System\Microsoft\CurrentControlSet\
 
+# Change Virtual Network Gateway Pointing at
+Set-VPNs2sinterface -name AzureVPN -IPaddress "<New Virtual Network Gateway Public IP>"
+    # Optionally change PSK too or use the same one
+
 # Optional (unless still unable to connect)
 route -p ADD 10.0.0.0 MASK 255.255.0.0 "<VPN Server IP>" METRIC 10
+
+# Change VPN Idle Disconnect Time
+Set-VPNs2sinterface -name AzureVPN -IdleDisconnectSeconds <Number of Seconds>
 
 <# Sources:
 https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/jj574210(v=ws.11)
