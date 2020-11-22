@@ -140,6 +140,10 @@ function New-CustomAzVM {
         $newConfigParams = @{
             'VMName' = $VmName
             'VMSize' = $VmSize
+            'Priority' = "Spot"
+            'MaxPrice' = -1
+            'EvictionPolicy' = Deallocate
+            #New-AzVMConfig -VMName $vmName -VMSize Standard_D1 -Priority "Spot" -MaxPrice -1 -EvictionPolicy Deallocate
         }
         $vmConfig = New-AzVMConfig @newConfigParams
 

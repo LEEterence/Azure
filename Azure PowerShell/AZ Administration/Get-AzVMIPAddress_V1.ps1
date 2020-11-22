@@ -20,7 +20,7 @@ foreach($Nic in $Nics)
     $Alloc = $Nic.IpConfigurations | Select-Object -ExpandProperty PrivateIpAllocationMethod
 
     # Outputting into custom table using pscustomobject
-    $results = [pscustomobject]@{ID = $ID;Name = $($Vm.name);Private = $Prv;Public = $Pub;ResourceGroup = $VM.ResourceGroupName;PrivateAllocationType = $Alloc}
+    $results += [pscustomobject]@{ID = $ID;Name = $($Vm.name);Private = $Prv;Public = $Pub;ResourceGroup = $VM.ResourceGroupName;PrivateAllocationType = $Alloc}
 
     $ID++
 }
