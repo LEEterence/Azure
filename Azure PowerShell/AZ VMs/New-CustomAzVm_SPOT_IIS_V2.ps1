@@ -5,9 +5,14 @@ Source: https://github.com/adbertram/PowerShellForSysadmins/blob/master/Part%20I
 @ REMINDERS: 
     1. Must be in the SAME LOCATION
     2. Public IP and Virtual NIC MUST be DIFFERENT (everything else can stay the same)
+
+@ ChangeLog
+ - Addition of IIS Custom Script Extension
+ - Alternate format of querying public IP address & launching RDP
+
 #>
 
-function New-CustomAzVM {
+function New-CustomAz-IISVM {
     [CmdletBinding()]
     param
     (
@@ -25,6 +30,7 @@ function New-CustomAzVM {
         [Parameter(Mandatory)]
         [string]$SubnetName,
 
+        # Existing VM: enter new vNic
         [Parameter(Mandatory)]
         [string]$VirtualNicName,
 
@@ -33,6 +39,7 @@ function New-CustomAzVM {
         [ValidateNotNullOrEmpty()]
         [string]$VirtualNetworkName,
 
+        # Existing VM: create new public ip
         [Parameter(Mandatory)]
         [string]$PublicIpAddressName,
 
@@ -45,10 +52,11 @@ function New-CustomAzVM {
         [pscredential]$AdminCredential,
 
         [Parameter()]
-        [string]$Location = 'Canada Central',
+        [string]$Location = 'West US',
 
+        # SPOT Instance: change this - if using spot B2s and B1ms won't  work
         [Parameter()]
-        [string]$VmSize = 'Standard_B2s',
+        [string]$VmSize = 'Standard_D2s_v3',
         
         # Change as necessary
         [Parameter()]
@@ -57,8 +65,10 @@ function New-CustomAzVM {
         [Parameter()]
         [string]$VirtualNetworkAddressPrefix = '10.0.0.0/16',
 
-        # Existing RG: can use existing storage account - IF NEW, MUST BE UNIQUE
+        # Existing RG: can use existing storage account - IF NEW, MUST BE UNIQUE and less than 24 characters, alphanumeric lower case
         [Parameter(Mandatory)]
+        [ValidateLength(3,24)]
+        [ValidatePattern('^[a-z0-9]+$')]
         [string]$StorageAccountName,
 
         [Parameter()]
@@ -140,6 +150,10 @@ function New-CustomAzVM {
         $newConfigParams = @{
             'VMName' = $VmName
             'VMSize' = $VmSize
+            'Priority' = "Spot"
+            'MaxPrice' = -1
+            'EvictionPolicy' = "Deallocate"
+            #New-AzVMConfig -VMName $vmName -VMSize Standard_D1 -Priority "Spot" -MaxPrice -1 -EvictionPolicy Deallocate
         }
         $vmConfig = New-AzVMConfig @newConfigParams
 
@@ -177,14 +191,26 @@ function New-CustomAzVM {
         }else {
             Write-Host "$($vm.Name) has been created successfully" -ForegroundColor Green
             Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object Name,IpAddress
+            
+            # Install IIS
+            Write-Verbose "Installing IIS..."
+            $PublicSettings = '{"commandToExecute":"powershell Add-WindowsFeature Web-Server -IncludeManagementTools"}'
+
+            $IISParams = @{
+                ExtensionName       = "IIS"
+                ResourceGroupName   = $ResourceGroupName
+                VMName              = $vm.Name
+                Publisher           = "Microsoft.Compute"
+                ExtensionType       = "CustomScriptExtension"
+                TypeHandlerVersion  =  1.4
+                SettingString       = $PublicSettings
+                Location            = $Location
+            }
+            Set-AzVMExtension @IISParams
 
             $RDP = Read-Host "RDP to the host (Y/N)?"
             if($RDP.ToUpper() -eq 'Y'){
-                #$IP = Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object -ExpandProperty IpAddress
-                #mstsc /v:$IP
-
-                # Get-AzRemoteDesktopFile -ResourceGroupName "Rg1" -Name "AZVm1" -Launch
-                $vm | Get-AzRemoteDesktopFile -Launch 
+                $vm | Get-AzRemoteDesktopFile -ResourceGroupName $ResourceGroupName -Launch
             }
         }
     }

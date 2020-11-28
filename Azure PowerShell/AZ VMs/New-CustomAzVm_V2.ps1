@@ -180,11 +180,7 @@ function New-CustomAzVM {
 
             $RDP = Read-Host "RDP to the host (Y/N)?"
             if($RDP.ToUpper() -eq 'Y'){
-                #$IP = Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object -ExpandProperty IpAddress
-                #mstsc /v:$IP
-
-                # Get-AzRemoteDesktopFile -ResourceGroupName "Rg1" -Name "AZVm1" -Launch
-                $vm | Get-AzRemoteDesktopFile -Launch 
+                $vm | Get-AzRemoteDesktopFile -ResourceGroupName $ResourceGroupName -Launch
             }
         }
     }

@@ -3,7 +3,7 @@
  - Added Pscustomobject to better structure output
 
  Changes: 
-  - modified to ignore ip addresses pulled from aadds vnets
+  - add check for VM state
 #>
 
 $VMs = Get-AzVM
@@ -16,23 +16,29 @@ foreach($Nic in $Nics)
 {
     # Conditional statement now skips over IDs if they don't output information for a VM
     if($VM = $VMs | Where-Object -Property Id -eq $Nic.VirtualMachine.Id){
+        # Obtaining Public IP
         $PubID = ($Nic.IpConfigurations | Select-Object -ExpandProperty PublicIpAddress).ID
         $Pub = Get-AzPublicIpAddress | Where-Object {$_.Id -eq $pubid -and $_.IpAddress -ne $null} | Select-Object -ExpandProperty IpAddress
-    
+        
+        # Obtaining Private IP
         $Prv = $Nic.IpConfigurations | Select-Object -ExpandProperty PrivateIpAddress
         
+        # Obtaining NIC configuration type
         $Alloc = $Nic.IpConfigurations | Select-Object -ExpandProperty PrivateIpAllocationMethod
-    
+        
+        # Obtaining VM state
+        $State = Get-AzVM -Status -Name $vm.Name | Select-Object -ExpandProperty PowerState
+
         # Outputting into custom table using pscustomobject
         $results += [PSCustomObject]@{
-            ID = $ID
-            Name = $($Vm.name)
-            Private = $Prv
-            Public = $Pub
-            ResourceGroup = $VM.ResourceGroupName
-            PrivateAllocationType = $Alloc
+            ID              = $ID
+            Name            = $($Vm.name)
+            VMState         = $State
+            Private         = $Prv
+            Public          = $Pub
+            ResourceGroup   = $VM.ResourceGroupName
+            PrivateIPType   = $Alloc
         }
-    
         $ID++
     }
 }

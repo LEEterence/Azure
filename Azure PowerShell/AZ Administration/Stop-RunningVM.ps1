@@ -1,0 +1,1 @@
+get-azvm -Status | Where-Object {$_.powerstate -like "*running*"} | Stop-AzVM -Force   

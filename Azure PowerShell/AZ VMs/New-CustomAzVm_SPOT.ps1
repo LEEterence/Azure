@@ -180,14 +180,11 @@ function New-CustomAzVM {
             Write-Host "$($vm.Name) has failed deployment" -ForegroundColor Red
         }else {
             Write-Host "$($vm.Name) has been created successfully" -ForegroundColor Green
-            
-            #Get-AzVM -Name $vm.Name 
-            Get-AzPublicIpAddress -ResourceName $PublicIpAddressName -publicIP | Select-Object Name,IpAddress
+            Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object Name,IpAddress
 
-            $RDP = "RDP to the host (Y/N)?"
+            $RDP = Read-Host "RDP to the host (Y/N)?"
             if($RDP.ToUpper() -eq 'Y'){
-                $IP = Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object -ExpandProperty IpAddress
-                mstsc /v:$IP
+                $vm | Get-AzRemoteDesktopFile -ResourceGroupName $ResourceGroupName -Launch
             }
         }
     }
