@@ -35,8 +35,8 @@ New-IISWebServers -ResourceGroupName sleepygeeks -VmName SG-AZWEB -HostName SG-A
 .Example Use existing virtual network and a separate subnet dedicated for load balanced devices
 New-IISWebServers -ResourceGroupName sleepygeeks -VmName SG-AZWEB -HostName SG-AZWEB -SubnetName sg-backendpool-subnet -VirtualNicName sg-webnic -VirtualNetworkName sleepygeeks-vnet -avs sleepygeeks-availabilityset-iis -AdminCredential azureuser -verbose
 
-.Example same as above but with Public IPs
-New-IISWebServers -ResourceGroupName sleepygeeks -VmName SG-AZWEB -HostName SG-AZWEB -SubnetName sg-backendpool-subnet -VirtualNicName sg-webnic -VirtualNetworkName sleepygeeks-vnet -avs sleepygeeks-availabilityset-iis -AdminCredential azureuser -verbose
+.Example same as above but with dynamic Public IPs
+ New-IISWebServers -ResourceGroupName sleepygeeks -VmName SG-AZWEB -HostName SG-AZWEB -SubnetName sg-lb-subnet -VirtualNicName sg-webnic -VirtualNetworkName sg-vnet -avs sg-availabilityset-iis -PublicIpAddressName sg-web-publicip -PublicIpAddressAllocationMethod Dynamic -AdminCredential azureuser -verbose 
 
 References: 
 https://github.com/adbertram/PowerShellForSysadmins/blob/master/Part%20II/Controlling%20the%20Cloud/New-CustomAzVm.ps1
@@ -129,7 +129,7 @@ function New-IISWebServers {
         [string]$PublicIpAddressAllocationMethod,
 
         [Parameter(Mandatory = $false)]
-        [string]$Location = 'West US',
+        [string]$Location = 'WestUS2',
 
         [Parameter(Mandatory = $false)]
         [string]$VmSize = 'Standard_B1ms',
@@ -216,6 +216,20 @@ function New-IISWebServers {
         if (Get-AzVm -Name "$VmName$x" -ResourceGroupName $ResourceGroupName -ErrorAction Ignore) {
             Write-Verbose -Message "The Azure virtual machine [$("$VmName$x")] already exists."
         }else{
+            ## Create public IP for each VM ##
+            if (-not ($publicIp = Get-AzPublicIpAddress -Name "$PublicIpAddressName$x" -ResourceGroupName $ResourceGroupName -ErrorAction Ignore)) {
+                $newPublicIpParams = @{
+                    'Name'              = "$PublicIpAddressName$x"
+                    'ResourceGroupName' = $ResourceGroupName
+                    'AllocationMethod'  = $PublicIpAddressAllocationMethod
+                    'Location'          = $Location
+                }
+                Write-Verbose -Message "Creating the public IP address [$("$PublicIpAddressName$x")].."
+                $publicIp = New-AzPublicIpAddress @newPublicIpParams
+            } else {
+                Write-Verbose -Message "The public IP address [$("$PublicIpAddressName$x")] already exists."
+            }
+
             ## Create unique NICs for each VM ##
             if (-not ($vNic = Get-AzNetworkInterface -Name "$VirtualNicName$x" -ResourceGroupName $ResourceGroupName -ErrorAction Ignore)) {
                 $newVNicParams = @{
@@ -223,14 +237,14 @@ function New-IISWebServers {
                     'ResourceGroupName' = $ResourceGroupName
                     'Location'          = $Location
                     'SubnetId'          = $vNet.Subnets[0].Id
-                    #'PublicIpAddressId' = $publicIp.Id
+                    'PublicIpAddressId' = $publicIp.Id
                 }
                 Write-Verbose -Message "Creating the virtual NIC [$("$VirtualNicName$x")]..."
                 $vNic = New-AzNetworkInterface @newVNicParams
             } else {
                 Write-Verbose -Message "The virtual NIC [$("$VirtualNicName$x")] already exists."
             }
-        
+            
             $newConfigParams = @{
                 'VMName' = "$vmname$x"
                 'VMSize' = $VmSize

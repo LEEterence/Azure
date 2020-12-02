@@ -13,7 +13,7 @@ foreach($Name in $Names){
     #$ResourceGroupName = "SleepyGeeks"
     $VMName = $Name
     $DomainName = "sleepygeeks.com"
-    $Location = "West US"
+    $Location = "West US 2"
     $DomainJoinAdminName = $DomainName + "\Administrator"
     $DomainJoinPassword = "Password1"
 

@@ -5,6 +5,9 @@ Source: https://github.com/adbertram/PowerShellForSysadmins/blob/master/Part%20I
 @ REMINDERS: 
     1. Must be in the SAME LOCATION
     2. Public IP and Virtual NIC MUST be DIFFERENT (everything else can stay the same)
+
+.Example Creating VM
+New-CustomAzVM -ResourceGroupName sleepygeeks -VmName SG-AZDC01 -HostName SG-AZDC01 -SubnetName sg-subnet -VirtualNicName sg-azdc01-vnic -VirtualNetworkName sg-vnet -AdminCredential azureuser -PublicIpAddressName sg-azdc01-publicip -PublicIpAddressAllocationMethod Static -StorageAccountName sg-storageaccount123123 -verbose  
 #>
 
 function New-CustomAzVM {
@@ -45,7 +48,7 @@ function New-CustomAzVM {
         [pscredential]$AdminCredential,
 
         [Parameter()]
-        [string]$Location = 'Canada Central',
+        [string]$Location = 'West US 2',
 
         [Parameter()]
         [string]$VmSize = 'Standard_B2s',
@@ -170,7 +173,7 @@ function New-CustomAzVM {
         $vm = Add-AzVMNetworkInterface -VM $vm -Id $vNic.Id
 
         Write-Verbose -Message "Creating virtual machine [$($VMName)]..."
-        New-AzVM -VM $vm -ResourceGroupName $ResourceGroupName -Location $Location
+        New-AzVM -VM $vm -ResourceGroupName $ResourceGroupName -Location $Location -AsJob
 
         if (-not(Get-AzVM -Name $vm.Name)){
             Write-Host "$($vm.Name) has failed deployment" -ForegroundColor Red
