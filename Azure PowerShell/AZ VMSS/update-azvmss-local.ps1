@@ -3,19 +3,19 @@
 Source: https://github.com/itorian/VirtualMachineScaleSetAutomationAndDeploymentUsingCustomScriptExtension/blob/master/PowerShell-Custom-Script-Extension-on-VMSS-using-commands-to-re-deploy-or-update-app/start-local.ps1
 #>
 
-$location = "WestUS"
+#$location = "WestUS"
 $ResourceGroupName = "SoftwareJuice"
-$vmssname = "sg-vmss"
-$vnet = "sj-vnet"
+$vmssname = "sj-vmss"
+#$vnet = "sj-vnet"
 
 # Define the script for your Custom Script Extension to run on vmss
 $publicSettings = @{
-    "fileUris" = (,"https://storageitorian.blob.core.windows.net/re-deploy-app/re-deploy-app.ps1");
-    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File re-deploy-app.ps1"
+    "fileUris" = (,"https://sjstorage123.blob.core.windows.net/vmss/update-azvmss-remote.ps1");
+    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File update-azvmss-remote.ps1"
   }
   
   # Get vmss
-  $vmss = Get-AzVmss -ResourceGroupName $resourcegroup -VMScaleSetName $vmssname
+  $vmss = Get-AzVmss -ResourceGroupName $ResourceGroupName -VMScaleSetName $vmssname
   
   # Remove extension
   $extensionname = "CustomScript"

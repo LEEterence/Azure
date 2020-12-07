@@ -3,7 +3,7 @@
 Source: https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/quick-create-powershell
 https://www.youtube.com/watch?v=I-AitAKC-pA&t=233s
 
-Configureing VMSS object cmdlets
+Configuring VMSS object cmdlets
 New-AzVmssConfig
 - Set-AzVmssOsProfile
 - Set-AzVmssStorageProfile
@@ -13,11 +13,12 @@ New-AzVmssConfig
 
 $location = "WestUS"
 $ResourceGroupName = "SoftwareJuice"
-$vmssname = "sg-vmss"
+$vmssname = "sj-vmss"
 $vnet = "sj-vnet"
 
 ##@ Create RG ##
-if(-not($ResourceGroupName = New-AzResourceGroup -ResourceGroupName $ResourceGroupName -Location $location)){
+  #* NOTE: do not input resourcegroup into a variable - reminder it won't store the RG name anymore but the entire RG OBJECT
+if(-not(Get-AzResourceGroup -ResourceGroupName $ResourceGroupName -Location $location)){
     New-AzResourceGroup `
     -ResourceGroupName $ResourceGroupName `
     -Location $location
@@ -45,9 +46,13 @@ New-AzVmss `
 
 ##@ Define the script for your Custom Script Extension to run ##
 $publicSettings = @{
-    "fileUris" = (,"https://sgstorage123.blob.core.windows.net/vmss/automate-iis.ps1");
+    "fileUris" = (,"https://sjstorage123.blob.core.windows.net/vmss/automate-iis.ps1");
     "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File automate-iis.ps1"
 }
+#$publicSettings = @{
+#    "fileUris" = (,"https://raw.githubusercontent.com/Azure-Samples/compute-automation-configurations/master/automate-iis.ps1");
+#    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File automate-iis.ps1"
+#}
 
 #@ Allow traffic to application
 ## Get information about the scale set ##
