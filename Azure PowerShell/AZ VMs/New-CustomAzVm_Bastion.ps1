@@ -1,5 +1,5 @@
-
 <# 
+~ Creating vm specific to bastions
 Source: https://github.com/adbertram/PowerShellForSysadmins/blob/master/Part%20II/Controlling%20the%20Cloud/New-CustomAzVm.ps1
 
 @ REMINDERS: 
@@ -10,11 +10,11 @@ Source: https://github.com/adbertram/PowerShellForSysadmins/blob/master/Part%20I
 New-CustomAzVM -ResourceGroupName sleepygeeks -VmName SG-AZDC01 -HostName SG-AZDC01 -SubnetName sg-subnet -VirtualNicName sg-azdc01-vnic -VirtualNetworkName sg-vnet -AdminCredential azureuser -PublicIpAddressName sg-azdc01-publicip -PublicIpAddressAllocationMethod Static -StorageAccountName sg-storageaccount123123 -verbose  
 
 .Example Adding to VM to Bastion subnet as a management VM (Names are different - NOTE: Bastion has to be setup already)
-New-CustomAzVM -ResourceGroupName sleepygeeks -VmName BastionVM -HostName BastionVM -SubnetName AzureBastionSubnet -StorageAccountName freesleepysga120111460 -VirtualNicName sg-bastionnic -VirtualNetworkName sg-vnet -AdminCredential azureuser -Verbose
+New-CustomAzVM_Bastion -ResourceGroupName sleepygeeks -VmName BastionVM -HostName BastionVM -SubnetName AzureBastionSubnet -StorageAccountName freesleepysga120111460 -VirtualNicName sg-bastionnic -VirtualNetworkName sg-vnet -AdminCredential azureuser -Verbose
 
 #>
 
-function New-CustomAzVM {
+function New-CustomAzVM_Bastion {
     [CmdletBinding()]
     param
     (
@@ -40,10 +40,10 @@ function New-CustomAzVM {
         [ValidateNotNullOrEmpty()]
         [string]$VirtualNetworkName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$PublicIpAddressName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [ValidateSet('Static', 'Dynamic')]
         [string]$PublicIpAddressAllocationMethod,
 
@@ -104,18 +104,18 @@ function New-CustomAzVM {
             Write-Verbose -Message "The virtual network [$($VirtualNetworkName)] already exists."
         }
 
-        if (-not ($publicIp = Get-AzPublicIpAddress -Name $PublicIpAddressName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore)) {
-            $newPublicIpParams = @{
-                'Name'              = $PublicIpAddressName
-                'ResourceGroupName' = $ResourceGroupName
-                'AllocationMethod'  = $PublicIpAddressAllocationMethod
-                'Location'          = $Location
-            }
-            Write-Verbose -Message "Creating the public IP address [$($PublicIpAddressName)].."
-            $publicIp = New-AzPublicIpAddress @newPublicIpParams
-        } else {
-            Write-Verbose -Message "The public IP address [$($PublicIpAddressName)] already exists."
-        }
+        #if (-not ($publicIp = Get-AzPublicIpAddress -Name $PublicIpAddressName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore)) {
+        #    $newPublicIpParams = @{
+        #        'Name'              = $PublicIpAddressName
+        #        'ResourceGroupName' = $ResourceGroupName
+        #        'AllocationMethod'  = $PublicIpAddressAllocationMethod
+        #        'Location'          = $Location
+        #    }
+        #    Write-Verbose -Message "Creating the public IP address [$($PublicIpAddressName)].."
+        #    $publicIp = New-AzPublicIpAddress @newPublicIpParams
+        #} else {
+        #    Write-Verbose -Message "The public IP address [$($PublicIpAddressName)] already exists."
+        #}
 
         if (-not ($vNic = Get-AzNetworkInterface -Name $VirtualNicName -ResourceGroupName $ResourceGroupName -ErrorAction Ignore)) {
             $newVNicParams = @{
@@ -123,7 +123,7 @@ function New-CustomAzVM {
                 'ResourceGroupName' = $ResourceGroupName
                 'Location'          = $Location
                 'SubnetId'          = $vNet.Subnets[0].Id
-                'PublicIpAddressId' = $publicIp.Id
+                #'PublicIpAddressId' = $publicIp.Id
             }
             Write-Verbose -Message "Creating the virtual NIC [$($VirtualNicName)]..."
             $vNic = New-AzNetworkInterface @newVNicParams
@@ -183,7 +183,7 @@ function New-CustomAzVM {
             Write-Host "$($vm.Name) has failed deployment" -ForegroundColor Red
         }else {
             Write-Host "$($vm.Name) has been created successfully" -ForegroundColor Green
-            Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object Name,IpAddress
+            #Get-AzPublicIpAddress -ResourceName $PublicIpAddressName | Select-Object Name,IpAddress
 
             $RDP = Read-Host "RDP to the host (Y/N)?"
             if($RDP.ToUpper() -eq 'Y'){
