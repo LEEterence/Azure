@@ -15,6 +15,8 @@ $location = "WestUS"
 $ResourceGroupName = "SoftwareJuice"
 $vmssname = "sj-vmss"
 $vnet = "sj-vnet"
+$storageAcctName = "sjstorage123"
+$storageKey = "J4jpZpIY27N1bEodAoH/KUOea9COUFPS9C5HXs9pVr6mCyXa0N1A5IKWty3NFhrvYe7YafAE1cjPl9lMvlC8tQ=="
 
 ##@ Create RG ##
   #* NOTE: do not input resourcegroup into a variable - reminder it won't store the RG name anymore but the entire RG OBJECT
@@ -45,14 +47,21 @@ New-AzVmss `
   -UpgradePolicyMode "Automatic"
 
 ##@ Define the script for your Custom Script Extension to run ##
-$publicSettings = @{
-    "fileUris" = (,"https://sjstorage123.blob.core.windows.net/vmss/automate-iis.ps1");
-    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File automate-iis.ps1"
-}
+#$protectedsettings = @{
+#
+#    "fileUris" = ("https://sjstorage123.blob.core.windows.net/vmss/automate-iis.ps1");
+#    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File automate-iis.ps1";
+#    "storageAccountName" = $storageAcctName;
+#    "storageAccountKey" = $storageKey
+#}
 #$publicSettings = @{
-#    "fileUris" = (,"https://raw.githubusercontent.com/Azure-Samples/compute-automation-configurations/master/automate-iis.ps1");
+#    "fileUris" = (,"https://sjstorage123.blob.core.windows.net/vmss/automate-iis.ps1");
 #    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File automate-iis.ps1"
 #}
+$publicSettings = @{
+    "fileUris" = (,"https://raw.githubusercontent.com/Azure-Samples/compute-automation-configurations/master/automate-iis.ps1");
+    "commandToExecute" = "powershell -ExecutionPolicy Unrestricted -File automate-iis.ps1"
+}
 
 #@ Allow traffic to application
 ## Get information about the scale set ##
@@ -66,7 +75,7 @@ Add-AzVmssExtension -VirtualMachineScaleSet $vmss `
     -Publisher "Microsoft.Compute" `
     -Type "CustomScriptExtension" `
     -TypeHandlerVersion 1.8 `
-    -Setting $publicSettings
+    -ProtectedSettings $publicSettings
 
 ## Update the scale set and apply the Custom Script Extension to the VM instances ##
 Update-AzVmss `
