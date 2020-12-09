@@ -10,7 +10,7 @@ Add-WindowsFeature -Name Web-Server -IncludeAllSubFeature
 Remove-Item C:\inetpub\wwwroot\* -Recurse -Force
 
 # download website zip package
-$ZipBlobUrl = 'https://sjstorage123.blob.core.windows.net/vmss/AzWebSite-Update.zip'
+$ZipBlobUrl = 'https://github.com/LEEterence/Azure/blob/master/Azure%20PowerShell/AZ%20VMSS/AzWebSite-Update.zip'
 $ZipBlobDownloadLocation = 'D:\AzWebSite-Update.zip'
 (New-Object System.Net.WebClient).DownloadFile($ZipBlobUrl, $ZipBlobDownloadLocation)
 
